@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name = "viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Todo Tracker</title>
+    <style>
+      /*styling for the whole JS body*/
+      body{
+        padding: 15px;
+        background-color: #45c3d9;
+        font-family: san-serif;
+      }
+
+      #title {
+        padding: 10px;
+        font-size: 36 px;
+        border: 2px solid #FFF;
+        width: 250px;
+      }
+
+      #todo-header{
+        font-size: 24px;
+      }
+
+      ul{
+        list-style: none;
+        padding-left: 0; /*eliminate default padding on the left side*/
+        width: 250px;
+      }
+
+      li{
+        color: #333;
+        background-color: rgba(255, 255, 255, .5);
+        padding: 15px;
+        margin-bottom: 15px; /*more space between todos*/
+        border-radius: 5px; /*rounded edges*/
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id= "title">Todo Tracker</h1> <!--heading-->
+    <form>
+      <input type="text" id="user-todo" placeHolder="New Todo" required>
+    </form> <!--'required' prevents the form from being submitted without userinput-->
+    <h2 id="todo-header">Todos</h2>
+
+
+    <ul>
+
+    </ul>
+    <button id="clear">Clear All</button>
+    <script>
+      /*Target form, unordered list, button, input*/
+      var form = document.querySelector('form');
+      var todosList = document.querySelector('ul');
+      var button = document.getElementById('clear');
+      var input = document.getElementById('user-todo');
+
+      //Declare variable 'todosArray' to hold our todos
+      //var todosArray = []; if Chrome's localStorage has 'todos', the values will be converted to an array, if not then create an empty array
+      var todosArray = localStorage.getItem('todos') ? JSON.parse(localStorage.getItem('todos')) : [];
+
+      //use localStorage.setItem() to set 'todos' to a string with 'JSON.stringify()' because local storage works with strings --> how we send data to the localStorage
+      localStorage.setItem('todos', JSON.stringify(todosArray));
+      //declare a var storage containing all the info in localStorage: assign to storage JSON.parse() to convert string from local storage into data accessible with JavaScript. When receiving data from a web server, the data is always a string. Parse the data and it becomes a JS object
+      var storage = JSON.parse(localStorage.getItem('todos'));
+      //whenever a user submit an item, it gets added to the array todosArray, update the todo item in localStoragedisplay it with todoMaker
+      form.addEventListener('submit', function(e){
+        e.preventDefault(); //prevent from refreshing the page
+        todosArray.push(input.value);
+        localStorage.setItem('todos', JSON.stringify(todosArray));  //local storage expects a string
+        todoMaker(input.value); //the text entered will remain in the input box
+        input.value = ''; //to clear the box afterwards
+      });
+
+    var todoMaker = function(text){
+      var newTodo = document.createElement('li');
+      newTodo.textContent = text;
+      todosList.appendChild(newTodo);
+    }
+    //loop through localStorage when a user first opens a page and runs todoMaker function
+    for(var i = 0; i < storage.length; i++){
+      todoMaker(storage[i]); //create a list item of storage[i]
+    }
+
+
+//attach an event listener to the 'clear all' button
+      button.addEventListener('click', function(){
+        while (todosList.firstChild){ //ul targeted by todosList has an li element
+          todosList.removeChild(todosList.firstChild);
+          //clear the localStorage with clear all button
+          localStorage.clear();
+        }
+      });
+
+    </script>
+    </body>
+</html>
